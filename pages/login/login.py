@@ -14,7 +14,9 @@ def get_credentials():
         'password': os.getenv('PASSWORD'),
         'otp': os.getenv('OTP'),
         'invalid_email': os.getenv('INVALID_EMAIL'),
-        'invalid_password': os.getenv('INVALID_PASSWORD')
+        'invalid_password': os.getenv('INVALID_PASSWORD'),
+        'inactive_email': os.getenv('INACTIVE_EMAIL'),
+        'inactive_password': os.getenv('INACTIVE_PASSWORD')
     }
     return credentials
 
@@ -46,6 +48,12 @@ class Login:
     def input_invalid_email(self, locator):
         invalid_email = self.credentials['invalid_email']
         self.helper.wait_and_input_text(locator, invalid_email)  # Input invalid email
+
+    def input_inactive_credentials(self, email_locator, password_locator):
+        inactive_email = self.credentials['inactive_email']
+        inactive_password = self.credentials['inactive_password']
+        self.helper.wait_and_input_text(email_locator, inactive_email)  # Input invalid email
+        self.helper.wait_and_input_text(password_locator, inactive_password)  # Input password
 
     # Function to input password into the password field
     def input_password(self, locator):
