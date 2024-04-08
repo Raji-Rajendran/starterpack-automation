@@ -64,9 +64,8 @@ def test_url_after_admin_logout(logout_page, login_page):
 
     logout_page.driver.execute_script("window.open('');")
     logout_page.driver.switch_to.window(logout_page.driver.window_handles[1])
-    logout_page.open_dashboard()  # Open the login page
+    login_page.open_dashboard()  # Open the login page
     time.sleep(2)  # Wait for 2 seconds
     assert login_page.driver.current_url == Config.base_url + "admin/login?to=/dashboard"  # Assert that the current URL is correct
-
 
 # Run the test cases by executing the command: pytest tests/test_logout.py

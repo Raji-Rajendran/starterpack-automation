@@ -31,6 +31,9 @@ class Login:
     def open(self):
         self.driver.get(Config.base_url + "admin/login")
 
+    def open_dashboard(self):
+        self.driver.get(Config.base_url + "dashboard")
+
     # Function to get the title of the current page
     def get_title(self):
         return self.driver.title
