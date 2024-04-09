@@ -1,3 +1,4 @@
+import re
 import time
 
 import pytest
@@ -78,3 +79,63 @@ class Admins:
         # Extract the text value
         name_value = name_element.text
         return name_value
+
+    def verify_admin_added(self):
+        try:
+            self.driver.find_element(By.XPATH, "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/div/h6/a[@class='font-weight-medium text-link']")
+            return True
+        except NoSuchElementException:
+            return False
+
+    def find_role_from_table(self):
+        role_element = self.driver.find_element(By.XPATH, "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/div/span[@class='v-chip__content']")
+        # Extract the text value
+        role_value = role_element.text
+        return role_value
+
+    def find_phone_from_table(self):
+        # Find the element containing the phone value
+        phone_element = self.driver.find_element(By.XPATH, "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/label[@class='v-label']")
+        # Extract the text value
+        phone_value = phone_element.text
+        # Slicing the phone number to get the desired part
+        sliced_phone = phone_value.split(" ")[1]
+        return sliced_phone
+
+    def check_status_is__inactive(self):
+        # Find the toggle button element
+        toggle_button = self.driver.find_element(By.CLASS_NAME, "v-selection-control__input")
+        # Check if the toggle button is turned off
+        if not toggle_button.is_selected():
+            print("Toggle button is turned off.")
+        else:
+            raise Exception("Toggle button is turned on.")
+
+    def verify_admin_view_url(self):
+        # Get the current URL
+        current_url = self.driver.current_url
+        # Check if the URL contains the expected value
+        pattern = r"https://qa\.starterpack\.2base\.in/admin/[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}/view"
+        # Check if the current URL matches the pattern
+        assert re.match(pattern, current_url), f"URL '{current_url}' does not match as the expected!"
+
+    def get_name_from_view(self):
+        # Find the element containing the value "Gena Andre"
+        name = self.driver.find_element(By.XPATH, "(//span[@class='text-capitalize'])[1]")
+        # Extract the text from the element
+        name_value = name.text
+        return name_value
+
+    def get_role_from_view(self):
+        # Find the element containing the value "Gena Andre"
+        role = self.driver.find_element(By.XPATH, "(//span[@class='text-capitalize'])[2]")
+        # Extract the text from the element
+        role_value = role.text
+        return role_value
+
+    def get_email_from_view(self):
+        # Find the element containing the email text
+        email_element = self.driver.find_element(By.XPATH, "//div[@class='v-list-item-title']//a[contains(@href, 'mailto:')]")
+        # Extract the email text from the element
+        email_text = email_element.text
+        return email_text
