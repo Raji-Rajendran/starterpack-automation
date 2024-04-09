@@ -36,3 +36,6 @@ class AdminsConfig:
     email_4 = "admin123@gmail"
 
     existing_email = credentials['existing_email']  # Access existing_email from credentials
+
+    filter_status = "Admin"
+    filter_role = "Active"

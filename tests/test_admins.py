@@ -170,7 +170,38 @@ def test_add_admin_with_existing_email(admin_page):
     admin_page.select_from_dropdown(AdminLocators.select_role, AdminsConfig.role)  # Select a value from the dropdown
     admin_page.click_item(AdminLocators.save_btn)  # Click the Save button
 
-    admin_page.verify_get_validation_messages()
+    error_toaster = admin_page.get_error_toaster(AdminLocators.error_message)  # Get the error toaster message
+
+    assert error_toaster == "The email has already been taken.", "Error message is not as expected!"
+
+
+def test_sort_by_name(admin_page):
+    admin_page.click_item(AdminLocators.admins)  # Click the search box
+    admin_page.wait_for_element_visible(AdminLocators.add_admin)  # Wait for the add admin button to be visible
+    admin_page.click_item(AdminLocators.sort_by_name)  # Click the menu icon
+    time.sleep(3)  # Wait for 3 seconds
+    admin_page.get_all_names()  # Get all the names from the table
+    admin_page.check_names_in_alphabetical_order()  # Check if the names are in alphabetical order
+
+
+def test_filter(admin_page):
+    admin_page.wait_for_element_visible(AdminLocators.add_admin)  # Wait for the add admin button to be visible
+
+    admin_page.click_item(AdminLocators.filter_btn)  # Click the filter button
+    admin_page.wait_for_element_visible(AdminLocators.save_filter)  # Wait for the save filter button to be visible
+
+    admin_page.input_text(AdminLocators.select_filter_status, AdminsConfig.filter_status)  # Input the status
+    admin_page.input_text(AdminLocators.select_filter_role, AdminsConfig.filter_role)  # Input the role
+    admin_page.click_item(AdminLocators.filter_close)  # Click the save filter button
+
+    admin_page.click_on_body()  # Click on the body
+
+    time.sleep(3)
+
+    admin_page.wait_for_element_visible(AdminLocators.add_admin)  # Wait for the add admin button to be visible
+
+    role = admin_page.find_role_from_table()
+    assert any(role_value in AdminsConfig.filter_status for role_value in role), "Roles in table are not filtered expected!"
 
 
 # Run the test cases by executing the command: pytest tests/test_admins.py

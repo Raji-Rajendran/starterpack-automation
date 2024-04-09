@@ -95,10 +95,16 @@ class Admins:
             return False
 
     def find_role_from_table(self):
-        role_element = self.driver.find_element(By.XPATH, "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/div/span[@class='v-chip__content']")
-        # Extract the text value
-        role_value = role_element.text
-        return role_value
+        # Find all the <td> elements in the table
+        td_elements = self.driver.find_elements(By.XPATH, "//tbody/tr/td[3]")
+
+        # Extract text from each <td> element and store in a list
+        third_column_values = [td.text for td in td_elements]
+
+        # Print the list of values
+        print(third_column_values)
+
+        return third_column_values
 
     def find_phone_from_table(self):
         # Find the element containing the phone value
@@ -203,6 +209,8 @@ class Admins:
         self.driver.execute_script("document.body.click();")
         validation_message_4 = self.driver.find_element(By.XPATH, "(//div[@class='v-messages__message'])[1]").text
 
+        self.helper.wait_and_click(clear_locator)
+
         return validation_message_1, validation_message_2, validation_message_3, validation_message_4
 
     def verify_get_validation_messages(self):
@@ -218,3 +226,57 @@ class Admins:
         validation_message = self.verify_get_validation_messages()  # Verify the mandatory fields
         assert validation_message == "This field is required"  # Assert that the validation message is correct
         self.helper.wait_and_input_text(field_locator, field_value)
+
+    def get_error_toaster(self, locator):
+        try:
+            self.helper.wait_for_element_visible(locator)
+            return self.helper.wait_and_get_text_by_visible_element(locator)
+        except Exception as e:
+            return "Error Toaster not found"
+
+    def click_on_body(self):
+        self.driver.execute_script("document.body.click();")
+
+    def get_all_statuses(self):
+        # Find all the toggle button elements
+        toggle_buttons = self.driver.find_elements(By.CLASS_NAME, "v-selection-control__input")
+
+        # Initialize an empty list to store the statuses
+        statuses = []
+
+        # Iterate through each toggle button element
+        for toggle_button in toggle_buttons:
+            # Check if the toggle button is turned on (active)
+            if toggle_button.is_selected():
+                # Append "Active" to the statuses list
+                statuses.append("Active")
+            else:
+                # Append "Inactive" to the statuses list
+                statuses.append("Inactive")
+        print(statuses)
+        return statuses
+
+    def get_all_names(self):
+        names = []
+        # Find the element containing the name value
+        name_elements = self.driver.find_elements(By.XPATH, "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/div/h6/a[@class='font-weight-medium text-link']")
+        for name in name_elements:
+            names.append(name.text)
+        return names
+
+    def check_names_in_alphabetical_order(self):
+        # Get all names
+        names = self.get_all_names()
+
+        # Extract first names
+        first_names = [name.split()[0] for name in names]
+
+        # Check if first names are in alphabetical order
+        sorted_first_names = sorted(first_names)
+        if first_names == sorted_first_names:
+            print("All first names are in alphabetical order.")
+        else:
+            # Find the index where the alphabetical order breaks
+            index = next(i for i, (name1, name2) in enumerate(zip(first_names, sorted_first_names)) if name1 != name2)
+            print(f"Issue occurred at index {index}: {first_names[index]} is not in alphabetical order.")
+            raise Exception("First names are not in alphabetical order.")
