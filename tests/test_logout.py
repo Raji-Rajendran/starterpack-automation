@@ -32,6 +32,7 @@ def test_admin_logout(logout_page, login_page):
 
     time.sleep(2)  # Wait for 2 seconds
     logout_page.click_profile_icon(LoginLocators.profile_icon)  # Click the profile icon
+    time.sleep(1)  # Wait for 1 second
     logout_page.click_logout(LoginLocators.logout)
     time.sleep(5)  # Wait for 5 seconds
     logout_page.login_form_visible(LoginLocators.login)  # Wait for the login form to appear
@@ -57,13 +58,14 @@ def test_url_after_admin_logout(logout_page, login_page):
 
     time.sleep(2)  # Wait for 2 seconds
     logout_page.click_profile_icon(LoginLocators.profile_icon)  # Click the profile icon
+    time.sleep(1)  # Wait for 1 second
     logout_page.click_logout(LoginLocators.logout)
     time.sleep(5)  # Wait for 5 seconds
     logout_page.login_form_visible(LoginLocators.login)  # Wait for the login form to appear
     assert "Starter Pack | Login" in logout_page.get_title()  # Assert that the page title is correct
 
     logout_page.driver.execute_script("window.open('');")
-    logout_page.driver.switch_to.window(logout_page.driver.window_handles[1])
+    logout_page.driver.switch_to.window(logout_page.driver.window_handles[2])
     login_page.open_dashboard()  # Open the login page
     time.sleep(2)  # Wait for 2 seconds
     assert login_page.driver.current_url == Config.base_url + "admin/login?to=/dashboard"  # Assert that the current URL is correct
