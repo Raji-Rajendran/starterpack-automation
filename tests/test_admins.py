@@ -38,6 +38,7 @@ def test_open_admins_page(admin_page):
     admin_page.click_item(AdminLocators.admins)  # Click the Admins link
     admin_page.wait_for_element_visible(AdminLocators.search_box)  # Wait for the search box to be visible
     time.sleep(2)  # Wait for 2 seconds
+    assert admin_page.driver.current_url == Config.base_url + "admin"  # Assert that the current URL is correct
 
 
 def test_add_admin(admin_page):
@@ -60,7 +61,7 @@ def test_add_admin(admin_page):
 
     time.sleep(2)  # Wait for 2 seconds
 
-    admin_page.wait_for_element_visible(AdminLocators.search_box)  # Click the Admins link
+    admin_page.wait_for_element_visible(AdminLocators.add_admin)  # Click the Admins link
 
     admin_page.click_item(AdminLocators.search_box)  # Click the search box
     admin_page.input_text(AdminLocators.search_box, AdminsConfig.email)  # Input the name
@@ -73,7 +74,10 @@ def test_add_admin(admin_page):
     list_email = admin_page.find_email_from_table()
     assert list_email == AdminsConfig.email  # Assert that the email is correct
 
-    admin_page.check_status_is__inactive()  # Check if the status is inactive
+    # list_phone = admin_page.find_phone_from_table()
+    # assert list_phone == str(AdminsConfig.phone)  # Assert that the phone number is correct
+
+    admin_page.check_status_is_inactive()  # Check if the status is inactive
 
 
 def test_view_admin(admin_page):
@@ -92,6 +96,81 @@ def test_view_admin(admin_page):
 
     view_email = admin_page.get_email_from_view()
     assert view_email == AdminsConfig.email  # Assert that the email is correct
+
+    view_phone = admin_page.get_phone_from_view()
+    assert view_phone == str(AdminsConfig.phone)  # Assert that the phone number is correct
+
+
+def test_edit_admin(admin_page):
+    time.sleep(1)  # Wait for 1 second
+    admin_page.click_item(AdminLocators.edit_btn)  # Click the Admins link
+    admin_page.wait_for_element_visible(AdminLocators.first_name)  # Wait for the save button to be visible
+    time.sleep(2)  # Wait for 2 seconds
+    assert admin_page.get_text_from_element(AdminLocators.page_heading) == "Edit Admin"  # Assert that the page heading is correct
+    assert admin_page.get_text_from_element(AdminLocators.page_description) == "Edit an admin here."  # Assert that the page description is correct
+
+    admin_page.verify_fields_validation(AdminLocators.first_name, AdminLocators.clear_first_name, AdminLocators.save_btn, AdminsConfig.first_name)
+
+    admin_page.input_text(AdminLocators.middle_name, AdminsConfig.middle_name)  # Input the middle name
+    admin_page.click_item(AdminLocators.save_btn)  # Click the Save button
+
+    admin_page.wait_for_element_visible(AdminLocators.add_admin)  # Click the Admins link
+
+    admin_page.click_item(AdminLocators.search_box)  # Click the search box
+    admin_page.input_text(AdminLocators.search_box, AdminsConfig.email)  # Input the email address
+
+    time.sleep(3)  # Wait for 3 seconds
+
+    list_name = admin_page.find_name_from_table()
+    assert list_name == AdminsConfig.first_name + " " + AdminsConfig.middle_name + " " + AdminsConfig.last_name  # Assert that the name is correct
+
+    time.sleep(5)  # Wait for 5 seconds
+
+
+def test_delete_admin(admin_page):
+    admin_page.click_item(AdminLocators.delete_btn)  # Click the Admins link
+    admin_page.wait_for_element_visible(AdminLocators.popup_card)  # Wait for the popup card to be visible
+    time.sleep(2)  # Wait for 2 seconds
+    admin_page.click_item(AdminLocators.confirm_btn)  # Click the removed icon
+    time.sleep(2)  # Wait for 2 seconds
+    admin_page.wait_for_element_visible(AdminLocators.removed_icon)  # Click the OK button
+    admin_page.click_item(AdminLocators.ok_btn)  # Click the OK button
+    time.sleep(3)  # Wait for 5 seconds
+
+    admin_page.wait_for_element_visible(AdminLocators.search_box)  # Click the Admins link
+
+    admin_page.clear_text(AdminLocators.search_box)  # Clear the search box
+    admin_page.click_item(AdminLocators.search_box)  # Click the search box
+    admin_page.input_text(AdminLocators.search_box, AdminsConfig.email)  # Input the email address
+    time.sleep(3)  # Wait for 3 seconds
+
+    admin_page.empty_table_check()  # Check if the table is empty
+
+
+def test_email_validations(admin_page):
+    time.sleep(2)  # Wait for 2 seconds
+    admin_page.click_item(AdminLocators.add_admin)  # Click the Add Admin button
+    admin_page.wait_for_element_visible(AdminLocators.page_heading)  # Wait for the page heading to be visible
+    validation_message_1, validation_message_2, validation_message_3, validation_message_4 = admin_page.verify_email_validation(AdminLocators.email, AdminLocators.clear_email, AdminsConfig.email_1, AdminsConfig.email_2, AdminsConfig.email_3, AdminsConfig.email_4)  # Verify the email validation
+
+    expected_message = "The Email field must be a valid email"
+
+    assert validation_message_1 == expected_message
+    assert validation_message_2 == expected_message
+    assert validation_message_3 == expected_message
+    assert validation_message_4 == expected_message
+
+
+def test_add_admin_with_existing_email(admin_page):
+    admin_page.input_text(AdminLocators.first_name, AdminsConfig.first_name)  # Input the first name
+    admin_page.input_text(AdminLocators.last_name, AdminsConfig.last_name)  # Input the last name
+    admin_page.input_text(AdminLocators.email, AdminsConfig.existing_email)  # Input the email
+
+    admin_page.input_text(AdminLocators.phone, AdminsConfig.phone)  # Input the phone number
+    admin_page.select_from_dropdown(AdminLocators.select_role, AdminsConfig.role)  # Select a value from the dropdown
+    admin_page.click_item(AdminLocators.save_btn)  # Click the Save button
+
+    admin_page.verify_get_validation_messages()
 
 
 # Run the test cases by executing the command: pytest tests/test_admins.py

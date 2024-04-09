@@ -25,6 +25,10 @@ class Admins:
     def get_title(self):
         return self.driver.title
 
+    def clear_field_with_js(self, locator):
+        element = self.driver.find_element(By.XPATH, locator)
+        self.driver.execute_script("arguments[0].value = '';", element)
+
     def click_item(self, locator):
         self.helper.wait_and_click(locator)
 
@@ -36,6 +40,9 @@ class Admins:
 
     def get_text_from_element(self, locator):
         return self.helper.wait_and_get_text_by_visible_element(locator)
+
+    def clear_text(self, locator):
+        self.helper.wait_and_clear_text(locator)
 
     def verify_placeholder(self):
         # Find all input elements
@@ -102,7 +109,7 @@ class Admins:
         sliced_phone = phone_value.split(" ")[1]
         return sliced_phone
 
-    def check_status_is__inactive(self):
+    def check_status_is_inactive(self):
         # Find the toggle button element
         toggle_button = self.driver.find_element(By.CLASS_NAME, "v-selection-control__input")
         # Check if the toggle button is turned off
@@ -116,6 +123,14 @@ class Admins:
         current_url = self.driver.current_url
         # Check if the URL contains the expected value
         pattern = r"https://qa\.starterpack\.2base\.in/admin/[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}/view"
+        # Check if the current URL matches the pattern
+        assert re.match(pattern, current_url), f"URL '{current_url}' does not match as the expected!"
+
+    def verify_admin_edit_url(self):
+        # Get the current URL
+        current_url = self.driver.current_url
+        # Check if the URL contains the expected value
+        pattern = r"https://qa\.starterpack\.2base\.in/admin/[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}"
         # Check if the current URL matches the pattern
         assert re.match(pattern, current_url), f"URL '{current_url}' does not match as the expected!"
 
@@ -139,3 +154,67 @@ class Admins:
         # Extract the email text from the element
         email_text = email_element.text
         return email_text
+
+    def get_phone_from_view(self):
+        # Find the element containing the value "Gena Andre"
+        phone_element = self.driver.find_element(By.XPATH, "(//span[@class='text-capitalize'])[4]")
+        # Extract the text value
+        phone_value = phone_element.text
+        # Slicing the phone number to get the desired part
+        sliced_phone = phone_value.split(" ")[1]
+        return sliced_phone
+
+    def check_status_is_active(self):
+        # Find the toggle button element
+        toggle_button = self.driver.find_element(By.CLASS_NAME, "v-selection-control__input")
+        # Check if the toggle button is turned on
+        if toggle_button.is_selected():
+            print("Toggle button is turned on.")
+        else:
+            raise Exception("Toggle button is turned off.")
+
+    def empty_table_check(self):
+        table_element = self.driver.find_element(By.XPATH, "//td[@colspan='8']")
+        # Locate the 'No data available' text within the table
+        no_data_text = table_element.text
+        return no_data_text
+
+    def verify_email_validation(self, locator, clear_locator, email_1, email_2, email_3, email_4):
+        self.helper.wait_and_input_text(locator, email_1)
+        time.sleep(1)  # Wait for 1 second
+        self.driver.execute_script("document.body.click();")
+        validation_message_1 = self.driver.find_element(By.XPATH, "(//div[@class='v-messages__message'])[1]").text
+
+        self.helper.wait_and_click(clear_locator)
+        self.helper.wait_and_input_text(locator, email_2)
+        time.sleep(1)  # Wait for 1 second
+        self.driver.execute_script("document.body.click();")
+        validation_message_2 = self.driver.find_element(By.XPATH, "(//div[@class='v-messages__message'])[1]").text
+
+        self.helper.wait_and_click(clear_locator)
+        self.helper.wait_and_input_text(locator, email_3)
+        time.sleep(1)  # Wait for 1 second
+        self.driver.execute_script("document.body.click();")
+        validation_message_3 = self.driver.find_element(By.XPATH, "(//div[@class='v-messages__message'])[1]").text
+
+        self.helper.wait_and_click(clear_locator)
+        self.helper.wait_and_input_text(locator, email_4)
+        time.sleep(1)  # Wait for 1 second
+        self.driver.execute_script("document.body.click();")
+        validation_message_4 = self.driver.find_element(By.XPATH, "(//div[@class='v-messages__message'])[1]").text
+
+        return validation_message_1, validation_message_2, validation_message_3, validation_message_4
+
+    def verify_get_validation_messages(self):
+        time.sleep(1)  # Wait for 1 second
+        self.driver.execute_script("document.body.click();")
+        validation_message = self.driver.find_element(By.XPATH, "(//div[@class='v-messages__message'])[1]").text
+        return validation_message
+
+    def verify_fields_validation(self, field_locator, clear_locator, save_locator, field_value):
+        self.helper.wait_and_click(field_locator)
+        self.helper.wait_and_click(clear_locator)
+        self.helper.wait_and_click(save_locator)
+        validation_message = self.verify_get_validation_messages()  # Verify the mandatory fields
+        assert validation_message == "This field is required"  # Assert that the validation message is correct
+        self.helper.wait_and_input_text(field_locator, field_value)
