@@ -200,8 +200,10 @@ def test_filter(admin_page):
 
     admin_page.wait_for_element_visible(AdminLocators.table_tbody)  # Wait for the add admin button to be visible
 
+    time.sleep(10)
+
     role = admin_page.find_role_from_table()
-    # assert any(role_value in AdminsConfig.filter_status for role_value in role), "Roles in table are not filtered as expected!"
+    assert any(role_value in AdminsConfig.filter_status for role_value in role), "Roles in table are not filtered as expected!"
 
 
 # Run the test cases by executing the command: pytest tests/test_admins.py
