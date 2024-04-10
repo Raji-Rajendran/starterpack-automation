@@ -33,3 +33,4 @@ class AdminLocators:
     select_filter_role = By.XPATH, "(//input[@type='text'])[7]"
     filter_close = By.XPATH, "(//i[@class='v-icon notranslate v-theme--dark tabler-x v-icon notranslate v-theme--dark'])[2]"
     sort_by_name = By.XPATH, "(//th[@class='v-data-table__td v-data-table-column--align-start v-data-table__th v-data-table__th--sortable v-data-table__th v-data-table__th--sortable'])[1]"
+    table_tbody = By.XPATH, "(//span[normalize-space()='User'])[1]"
