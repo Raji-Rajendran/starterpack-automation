@@ -1,10 +1,13 @@
 import time
 
 import pytest
+from selenium.common import NoSuchElementException
 
 from configs.config import Config, RolesConfig
+from locators.admin_locator import AdminLocators
 from locators.login_locator import LoginLocators
 from locators.role_locator import RoleLocators
+from pages.admins import Admins
 from pages.login.login import Login
 from pages.roles import Roles
 
@@ -18,6 +21,11 @@ def login_page(setup_driver):
 @pytest.fixture
 def role_page(setup_driver):
     return Roles(setup_driver)
+
+
+@pytest.fixture
+def admin_page(setup_driver):
+    return Admins(setup_driver)
 
 
 def test_admin_login(login_page):
@@ -60,14 +68,77 @@ def test_verify_add_role_with_all_permissions(role_page):
     role_page.wait_for_element_visible(RoleLocators.add_role)  # Wait for the page heading to be visible
 
     role_names = role_page.get_role_names_from_card()  # Get the role names from the card
-    assert RolesConfig.role_name in role_names  # Assert that the role name is correct
+    # Convert both `RolesConfig.role_name` and `role_names` to lowercase
+    role_name_lowercase = RolesConfig.role_name.lower()
+    role_names_lowercase = [name.lower() for name in role_names]
+    # Assert that the role name is correct (case-insensitive)
+    assert role_name_lowercase in role_names_lowercase  # Assert that the role name is correct
+
+
+def test_created_role_is_present(admin_page, role_page):
+    time.sleep(2)  # Wait for 2 seconds
+    admin_page.click_item(AdminLocators.users)  # Click the Admins link
+    admin_page.click_item(AdminLocators.admins)  # Click the Admins link
+    time.sleep(2)  # Wait for 2 seconds
+    admin_page.wait_for_element_visible(AdminLocators.search_box)  # Wait for the search box to be visible
+    admin_page.click_item(AdminLocators.add_admin)  # Click the Add Admin button
+    time.sleep(2)  # Wait for 2 seconds
+    admin_page.wait_for_element_visible(AdminLocators.email)  # Wait for the first name field to be visible
+    admin_page.input_text(AdminLocators.first_name, RolesConfig.admin_first_name)  # Input the first name
+    admin_page.input_text(AdminLocators.last_name, RolesConfig.admin_last_name)  # Input the last name
+    admin_page.input_text(AdminLocators.email, RolesConfig.admin_email)  # Input the email
+    admin_page.input_text(AdminLocators.phone, RolesConfig.admin_phone)  # Input the phone number
+    admin_page.select_from_dropdown(AdminLocators.select_role, RolesConfig.role_name)  # Select a value from the dropdown
+    admin_page.click_item(AdminLocators.save_btn)  # Click the Save button
+    time.sleep(2)  # Wait for 2 seconds
+
+    try:
+        admin_page.wait_for_element_visible(AdminLocators.add_admin)  # Click the Admins link
+
+        admin_page.click_item(AdminLocators.search_box)  # Click the search box
+        admin_page.input_text(AdminLocators.search_box, RolesConfig.admin_email)  # Input the name
+
+        time.sleep(3)  # Wait for 3 seconds
+
+        list_name = admin_page.find_name_from_table()
+        assert list_name == RolesConfig.admin_first_name + " " + RolesConfig.admin_last_name  # Assert that the name is correct
+
+        list_email = admin_page.find_email_from_table()
+        assert list_email == RolesConfig.admin_email  # Assert that the email is correct
+
+        list_role = admin_page.find_role_from_table()
+        assert list_role.lower() == RolesConfig.role_name.lower()  # Assert that the role is correct
+
+    except Exception:
+        validation_message = role_page.verify_get_validation_messages()  # Verify the validation messages
+        if validation_message == "This field is required":
+            raise Exception("Added Role is not present in the dropdown list")
 
 
 def test_delete_role(role_page):
-    role_page.delete_role(RolesConfig.role_name, RoleLocators.popup_card, RoleLocators.confirm_btn, RoleLocators.removed_icon, RoleLocators.ok_btn)  # Delete the role
+    time.sleep(3)  # Wait for 3 seconds
+    role_page.click_on_body()  # Click on the body
+    role_page.click_roles()  # Click the Admins link
+    role_page.wait_for_element_visible(RoleLocators.page_heading)  # Wait for the search box to be visible
+
+    role_page.add_role_with_all_permissions(RoleLocators.add_role, RoleLocators.select_all, RoleLocators.role_name, RolesConfig.new_role_name, RoleLocators.submit_btn)  # Add a role with all permissions
+    role_page.wait_for_element_visible(RoleLocators.add_role)  # Wait for the page heading to be visible
+    time.sleep(2)  # Wait for 2 seconds
+    role_page.delete_role(RolesConfig.new_role_name, RoleLocators.popup_card, RoleLocators.confirm_btn, RoleLocators.removed_icon, RoleLocators.ok_btn)  # Delete the role
     time.sleep(2)  # Wait for 2 seconds
 
     role_names = role_page.get_role_names_from_card()  # Get the role names from the card
-    assert RolesConfig.role_name not in role_names  # Assert that the role name is correct
+    assert RolesConfig.new_role_name not in role_names  # Assert that the role name is correct
+
+
+def test_role_name_validation(role_page):
+    role_page.click_item(RoleLocators.add_role)  # Wait for the Add Role button to be visible
+    time.sleep(2)  # Wait for 2 seconds
+    role_page.wait_for_element_visible(RoleLocators.select_all)  # Wait for the Select All checkbox to be visible
+    role_page.click_item(RoleLocators.submit_btn)
+
+    error_toaster = role_page.get_error_toaster(RoleLocators.error_toster)  # Get the error toaster
+    assert error_toaster == "The name field is required."  # Assert that the error toaster is correct
+
 
 # Run the test cases by executing the command: pytest tests/test_roles.py

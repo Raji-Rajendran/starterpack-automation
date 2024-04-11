@@ -119,7 +119,7 @@ class Roles:
                     role_names_set.add(role_name)
             except NoSuchElementException:
                 # Handle case where h4 element is not found within a card
-                print("Role element not found in a card.")
+                raise Exception("Role element not found in a card.")
 
         return role_names_set
 
@@ -151,4 +151,34 @@ class Roles:
                 break
             except NoSuchElementException:
                 # Handle case where h4 element is not found within a card
-                print("Role element not found in a card.")
+                raise Exception("Role element not found in a card.")
+
+    def get_error_toaster(self, locator):
+        try:
+            self.helper.wait_for_element_visible(locator)
+            return self.helper.wait_and_get_text_by_visible_element(locator)
+        except Exception as e:
+            raise Exception("Error Toaster not found")
+
+    def verify_get_validation_messages(self):
+        time.sleep(1)  # Wait for 1 second
+        self.driver.execute_script("document.body.click();")
+        validation_message = self.driver.find_element(By.XPATH, "(//div[@class='v-messages__message'])[1]").text
+        return validation_message
+
+    def find_role_from_table(self):
+        # Find the <td> element in the third column of the table
+        td_element = self.driver.find_element(By.XPATH, "//tbody/tr/td[3]")
+
+        # Extract text from the <td> element
+        third_column_value = td_element.text
+
+        return third_column_value
+
+    def add_role_with_all_permissions(self, add_role, select_all, role_name_locator, role_name, submit_btn):
+        self.helper.wait_and_click(add_role)
+        time.sleep(2)  # Wait for 2 seconds
+        self.helper.wait_for_element_visible(select_all)  # Wait for the Select All checkbox to be visible
+        self.helper.wait_and_input_text(role_name_locator, role_name)
+        self.helper.wait_and_click(select_all)  # Click the Select All checkbox
+        self.helper.wait_and_click(submit_btn)  # Click the Submit button
