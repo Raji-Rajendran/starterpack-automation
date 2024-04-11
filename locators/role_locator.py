@@ -14,3 +14,4 @@ class RoleLocators:
     confirm_btn = By.XPATH, "(//span[normalize-space()='Confirm'])[1]"
     ok_btn = By.XPATH, "(//button[@class='v-btn v-btn--elevated v-theme--dark bg-success v-btn--density-default v-btn--size-default v-btn--variant-elevated'])[1]"
     error_toster = By.XPATH, "(//div[@role='status'])[1]"
+    not_removed_text = By.XPATH, "//div[contains(@class, 'v-card-text')]/h1"

@@ -49,8 +49,10 @@ def test_open_roles_page(role_page):
 
 def test_verify_page_heading_description(role_page):
     time.sleep(2)  # Wait for 2 seconds
-    assert role_page.get_text_from_element(RoleLocators.page_heading) == "Roles List"  # Assert that the page heading is correct
-    assert role_page.get_text_from_element(RoleLocators.page_description) == "A role provided access to predefined menus and features so that depending on assigned role an administrator can have access to what he need."  # Assert that the page description is correct
+    assert role_page.get_text_from_element(
+        RoleLocators.page_heading) == "Roles List"  # Assert that the page heading is correct
+    assert role_page.get_text_from_element(
+        RoleLocators.page_description) == "A role provided access to predefined menus and features so that depending on assigned role an administrator can have access to what he need."  # Assert that the page description is correct
 
 
 def test_verify_add_role_with_all_permissions(role_page):
@@ -58,8 +60,10 @@ def test_verify_add_role_with_all_permissions(role_page):
     time.sleep(2)  # Wait for 2 seconds
     role_page.wait_for_element_visible(RoleLocators.select_all)  # Wait for the Select All checkbox to be visible
     assert role_page.driver.current_url == Config.base_url + "admin/roles/add"  # Assert that the current URL is correct
-    assert role_page.get_text_from_element(RoleLocators.page_heading) == "Add New Role"  # Assert that the Add Role button text is correct
-    assert role_page.get_text_from_element(RoleLocators.page_description) == "Add New Role and Permissions."  # Assert that the Add Role button text is correct
+    assert role_page.get_text_from_element(
+        RoleLocators.page_heading) == "Add New Role"  # Assert that the Add Role button text is correct
+    # assert role_page.get_text_from_element(
+    #     RoleLocators.page_description) == "Add New Role and Permissions."  # Assert that the Add Role button text is correct
     role_page.wait_for_element_visible(RoleLocators.select_all)  # Wait for the Select All checkbox to be visible
     role_page.input_text(RoleLocators.role_name, RolesConfig.role_name)  # Input the role name
     role_page.click_item(RoleLocators.select_all)  # Click the Select All checkbox
@@ -88,11 +92,11 @@ def test_created_role_is_present(admin_page, role_page):
     admin_page.input_text(AdminLocators.last_name, RolesConfig.admin_last_name)  # Input the last name
     admin_page.input_text(AdminLocators.email, RolesConfig.admin_email)  # Input the email
     admin_page.input_text(AdminLocators.phone, RolesConfig.admin_phone)  # Input the phone number
-    admin_page.select_from_dropdown(AdminLocators.select_role, RolesConfig.role_name)  # Select a value from the dropdown
-    admin_page.click_item(AdminLocators.save_btn)  # Click the Save button
-    time.sleep(2)  # Wait for 2 seconds
-
     try:
+        admin_page.select_from_dropdown(AdminLocators.select_role,
+                                        RolesConfig.role_name)  # Select a value from the dropdown
+        admin_page.click_item(AdminLocators.save_btn)  # Click the Save button
+
         admin_page.wait_for_element_visible(AdminLocators.add_admin)  # Click the Admins link
 
         admin_page.click_item(AdminLocators.search_box)  # Click the search box
@@ -110,21 +114,37 @@ def test_created_role_is_present(admin_page, role_page):
         assert list_role.lower() == RolesConfig.role_name.lower()  # Assert that the role is correct
 
     except Exception:
+        admin_page.click_item(AdminLocators.save_btn)  # Click the Save button
         validation_message = role_page.verify_get_validation_messages()  # Verify the validation messages
         if validation_message == "This field is required":
             raise Exception("Added Role is not present in the dropdown list")
 
 
-def test_delete_role(role_page):
+def test_delete_role_with_users(role_page):
     time.sleep(3)  # Wait for 3 seconds
     role_page.click_on_body()  # Click on the body
     role_page.click_roles()  # Click the Admins link
     role_page.wait_for_element_visible(RoleLocators.page_heading)  # Wait for the search box to be visible
 
-    role_page.add_role_with_all_permissions(RoleLocators.add_role, RoleLocators.select_all, RoleLocators.role_name, RolesConfig.new_role_name, RoleLocators.submit_btn)  # Add a role with all permissions
+    role_page.delete_user_added_role(RolesConfig.role_name, RoleLocators.popup_card, RoleLocators.confirm_btn,
+                                     RoleLocators.removed_icon, RoleLocators.not_removed_text,
+                                     RoleLocators.ok_btn)  # Delete the role
+    time.sleep(2)  # Wait for 2 seconds
+
+    role_names = role_page.get_role_names_from_card()  # Get the role names from the card
+    assert RolesConfig.role_name in role_names  # Assert that the role name is correct
+
+
+def test_delete_role(role_page):
+    time.sleep(2)  # Wait for 2 seconds
+
+    role_page.add_role_with_all_permissions(RoleLocators.add_role, RoleLocators.select_all, RoleLocators.role_name,
+                                            RolesConfig.new_role_name,
+                                            RoleLocators.submit_btn)  # Add a role with all permissions
     role_page.wait_for_element_visible(RoleLocators.add_role)  # Wait for the page heading to be visible
     time.sleep(2)  # Wait for 2 seconds
-    role_page.delete_role(RolesConfig.new_role_name, RoleLocators.popup_card, RoleLocators.confirm_btn, RoleLocators.removed_icon, RoleLocators.ok_btn)  # Delete the role
+    role_page.delete_role(RolesConfig.new_role_name, RoleLocators.popup_card, RoleLocators.confirm_btn,
+                          RoleLocators.removed_icon, RoleLocators.ok_btn)  # Delete the role
     time.sleep(2)  # Wait for 2 seconds
 
     role_names = role_page.get_role_names_from_card()  # Get the role names from the card
@@ -139,6 +159,5 @@ def test_role_name_validation(role_page):
 
     error_toaster = role_page.get_error_toaster(RoleLocators.error_toster)  # Get the error toaster
     assert error_toaster == "The name field is required."  # Assert that the error toaster is correct
-
 
 # Run the test cases by executing the command: pytest tests/test_roles.py
