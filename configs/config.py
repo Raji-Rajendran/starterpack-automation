@@ -1,4 +1,5 @@
 import os
+import random
 from random import randint
 
 import barnum
@@ -39,3 +40,12 @@ class AdminsConfig:
 
     filter_status = "Admin"
     filter_role = "Active"
+
+
+class UsersConfig:
+    emails = ['alvera39@gmail.com', 'ufranecki@runolfsson.com', 'bgrant@stokes.info', 'kamron.heathcote@mueller.com',
+              'hulda.franecki@hotmail.com', 'urice@dietrich.net', 'qmarquardt@hirthe.com', 'kirstin.veum@gmail.com',
+              'kristoffer.thiel@simonis.com', 'augustine65@rutherford.com']
+    email = random.choice(emails)
+
+    filter_status = "Active"
