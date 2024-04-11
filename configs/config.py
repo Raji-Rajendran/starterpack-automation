@@ -49,3 +49,9 @@ class UsersConfig:
     email = random.choice(emails)
 
     filter_status = "Active"
+
+
+class RolesConfig:
+    role_names = ['Employee', 'Supervisor', 'Team Lead', 'Developer', 'Consultant', 'Coordinator', 'Specialist', 'Executive', 'Director', 'Team Member', 'Project Manager', 'Assistant', 'Associate', 'Senior Manager', 'Junior Manager', 'Senior Developer', 'Junior Developer', 'Senior Analyst', 'Junior Analyst', 'Senior Consultant', 'Junior Consultant', 'Senior Coordinator', 'Junior Coordinator', 'Senior Specialist', 'Junior Specialist', 'Senior Executive', 'Junior Executive', 'Chief Executive Officer', 'Chief Operating Officer', 'Chief Financial Officer', 'Chief Technology Officer', 'Chief Marketing Officer', 'Chief Human Resources Officer', 'Chief Information Officer', 'Senior Supervisor', 'Junior Supervisor', 'Senior Team Lead', 'Junior Team Lead', 'Lead Developer', 'Lead Analyst']
+    role_name = random.choice(role_names)
+
