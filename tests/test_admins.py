@@ -56,7 +56,8 @@ def test_add_admin(admin_page):
     admin_page.input_text(AdminLocators.last_name, AdminsConfig.last_name)  # Input the last name
     admin_page.input_text(AdminLocators.email, AdminsConfig.email)  # Input the email
     admin_page.input_text(AdminLocators.phone, AdminsConfig.phone)  # Input the phone number
-    admin_page.select_from_dropdown(AdminLocators.select_role, AdminsConfig.role)  # Select a value from the dropdown
+    admin_page.click_item(AdminLocators.role)  # Click the status dropdown
+    admin_page.select_role_from_dropdown(AdminsConfig.role)  # Select a value from the dropdown
     admin_page.click_item(AdminLocators.save_btn)  # Click the Save button
 
     time.sleep(2)  # Wait for 2 seconds
@@ -167,7 +168,7 @@ def test_add_admin_with_existing_email(admin_page):
     admin_page.input_text(AdminLocators.email, AdminsConfig.existing_email)  # Input the email
 
     admin_page.input_text(AdminLocators.phone, AdminsConfig.phone)  # Input the phone number
-    admin_page.select_from_dropdown(AdminLocators.select_role, AdminsConfig.role)  # Select a value from the dropdown
+    admin_page.select_role_from_dropdown(AdminsConfig.role)  # Select a value from the dropdown
     admin_page.click_item(AdminLocators.save_btn)  # Click the Save button
 
     error_toaster = admin_page.get_error_toaster(AdminLocators.error_message)  # Get the error toaster message

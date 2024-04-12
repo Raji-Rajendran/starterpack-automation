@@ -163,7 +163,7 @@ class Admins:
 
     def get_phone_from_view(self):
         # Find the element containing the value "Gena Andre"
-        phone_element = self.driver.find_element(By.XPATH, "(//span[@class='text-capitalize'])[4]")
+        phone_element = self.driver.find_element(By.XPATH, "//div[@class='v-list-item-title']/a")
         # Extract the text value
         phone_value = phone_element.text
         # Slicing the phone number to get the desired part
@@ -280,3 +280,20 @@ class Admins:
             index = next(i for i, (name1, name2) in enumerate(zip(first_names, sorted_first_names)) if name1 != name2)
             print(f"Issue occurred at index {index}: {first_names[index]} is not in alphabetical order.")
             raise Exception("First names are not in alphabetical order.")
+
+    def select_role_from_dropdown(self, role):
+        # Wait for the dropdown element to be clickable
+        dropdown = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "(//input[@type='text'])[5]")))
+
+        # Click on the dropdown to open it
+        dropdown.click()
+
+        # Wait for the dropdown options to be visible
+        dropdown_options = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_all_elements_located((By.CSS_SELECTOR, ".v-autocomplete__content .v-list-item")))
+
+        # Loop through the dropdown options and find the one you want to select
+        for option in dropdown_options:
+            if option.text == role:
+                option.click()
+                break
