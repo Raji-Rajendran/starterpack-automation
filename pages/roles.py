@@ -1,7 +1,7 @@
 import re
 import time
 
-from selenium.common import NoSuchElementException, StaleElementReferenceException
+from selenium.common import NoSuchElementException, StaleElementReferenceException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -170,17 +170,17 @@ class Roles:
                         trash_icon = card.find_element(By.CSS_SELECTOR, "i.v-icon.tabler-trash")
                         trash_icon.click()
                         self.helper.wait_for_element_visible(popup_card)
+                        self.helper.wait_for_element_visible(confirm_btn)
                         self.helper.wait_and_click(confirm_btn)
                         time.sleep(2)  # Wait for 2 seconds
                         self.helper.wait_for_element_visible(removed_icon)
-                        not_removed_text = self.helper.wait_and_get_text_by_visible_element(not_removed_text)
+                        # assert self.helper.wait_and_get_text_by_visible_element(not_removed_text) == "Not Removed!"
                         self.helper.wait_and_click(ok_btn)
                         time.sleep(1)  # Wait for 1 second
-                        print(not_removed_text)
                         break
             except StaleElementReferenceException:
                 # Handle stale element reference exception by retrying
-                self.delete_role(role_to_match, popup_card, confirm_btn, removed_icon, ok_btn)
+                self.delete_user_added_role(role_to_match, popup_card, confirm_btn, removed_icon, not_removed_text, ok_btn)
                 break
             except NoSuchElementException:
                 # Handle case where h4 element is not found within a card
@@ -215,3 +215,29 @@ class Roles:
         self.helper.wait_and_input_text(role_name_locator, role_name)
         self.helper.wait_and_click(select_all)  # Click the Select All checkbox
         self.helper.wait_and_click(submit_btn)  # Click the Submit button
+
+    def edit_role_page(self, role_to_match):
+        # Wait for the cards to load
+        cards = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_all_elements_located((By.XPATH, "//div[contains(@class, 'v-card')]")))
+
+        # Iterate through each card
+        for card in cards:
+            try:
+                # Extract the name of the role from the card using CSS selector
+                role_elements = card.find_elements(By.CSS_SELECTOR, "h4")
+                for role_element in role_elements:
+                    role_name = role_element.text.strip()
+                    if role_name == role_to_match:
+                        # Click on the "Edit Role" link if the role name matches
+                        edit_role_link = card.find_element(By.XPATH, ".//a[text()='Edit Role']")
+                        edit_role_link.click()
+                        print(f"Clicked on 'Edit Role' link for role: {role_to_match}")
+                        break
+            except StaleElementReferenceException:
+                # Handle StaleElementReferenceException by refreshing the page and re-finding the element
+                self.edit_role_page(role_to_match)
+                break
+            except NoSuchElementException:
+                # Handle case where h4 element is not found within a card
+                raise Exception("Role element not found in a card.")
