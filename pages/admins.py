@@ -1,12 +1,10 @@
 import re
 import time
 
-import pytest
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.select import Select
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 from configs.config import Config
 from utils.helper_functions import HelperFunctions
@@ -75,21 +73,24 @@ class Admins:
         dropdown_element.send_keys(value)
 
     def find_email_from_table(self):
-        email_element = self.driver.find_element(By.XPATH, "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/div/span[@class='text-sm text-medium-emphasis']")
+        email_element = self.driver.find_element(By.XPATH,
+                                                 "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/div/span[@class='text-sm text-medium-emphasis']")
         # Extract the text value
         email_value = email_element.text
         return email_value
 
     def find_name_from_table(self):
         # Find the element containing the name value
-        name_element = self.driver.find_element(By.XPATH, "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/div/h6/a[@class='font-weight-medium text-link']")
+        name_element = self.driver.find_element(By.XPATH,
+                                                "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/div/h6/a[@class='font-weight-medium text-link']")
         # Extract the text value
         name_value = name_element.text
         return name_value
 
     def verify_admin_added(self):
         try:
-            self.driver.find_element(By.XPATH, "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/div/h6/a[@class='font-weight-medium text-link']")
+            self.driver.find_element(By.XPATH,
+                                     "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/div/h6/a[@class='font-weight-medium text-link']")
             return True
         except NoSuchElementException:
             return False
@@ -108,7 +109,8 @@ class Admins:
 
     def find_phone_from_table(self):
         # Find the element containing the phone value
-        phone_element = self.driver.find_element(By.XPATH, "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/label[@class='v-label']")
+        phone_element = self.driver.find_element(By.XPATH,
+                                                 "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/label[@class='v-label']")
         # Extract the text value
         phone_value = phone_element.text
         # Slicing the phone number to get the desired part
@@ -156,7 +158,8 @@ class Admins:
 
     def get_email_from_view(self):
         # Find the element containing the email text
-        email_element = self.driver.find_element(By.XPATH, "//div[@class='v-list-item-title']//a[contains(@href, 'mailto:')]")
+        email_element = self.driver.find_element(By.XPATH,
+                                                 "//div[@class='v-list-item-title']//a[contains(@href, 'mailto:')]")
         # Extract the email text from the element
         email_text = email_element.text
         return email_text
@@ -259,7 +262,8 @@ class Admins:
     def get_all_names(self):
         names = []
         # Find the element containing the name value
-        name_elements = self.driver.find_elements(By.XPATH, "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/div/h6/a[@class='font-weight-medium text-link']")
+        name_elements = self.driver.find_elements(By.XPATH,
+                                                  "//tbody/tr/td[contains(@class, 'v-data-table__td')]/div/div/h6/a[@class='font-weight-medium text-link']")
         for name in name_elements:
             names.append(name.text)
         return names
@@ -283,7 +287,8 @@ class Admins:
 
     def select_role_from_dropdown(self, role):
         # Wait for the dropdown element to be clickable
-        dropdown = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "(//input[@type='text'])[5]")))
+        dropdown = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "(//input[@type='text'])[5]")))
 
         # Click on the dropdown to open it
         dropdown.click()

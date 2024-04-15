@@ -1,9 +1,7 @@
 import random
-import re
 import time
 
-import pytest
-from selenium.common import NoSuchElementException, StaleElementReferenceException, TimeoutException
+from selenium.common import NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait

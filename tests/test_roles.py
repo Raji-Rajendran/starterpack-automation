@@ -1,10 +1,8 @@
 import time
 
 import pytest
-from selenium.common import NoSuchElementException
 
 from configs.config import Config, RolesConfig
-from locators.admin_locator import AdminLocators
 from locators.login_locator import LoginLocators
 from locators.role_locator import RoleLocators
 from pages.admins import Admins
@@ -231,10 +229,7 @@ def test_create_role_with_permissions(role_page):
     role_page.click_roles()  # Click the Admins link
     role_page.wait_for_element_visible(RoleLocators.page_heading)  # Wait for the search box to be visible
 
-    role_page.delete_role(RolesConfig.role_name, RoleLocators.popup_card, RoleLocators.confirm_btn, RoleLocators.removed_icon, RoleLocators.ok_btn)  # Delete the role
-
-
-
-
+    role_page.delete_role(RolesConfig.role_name, RoleLocators.popup_card, RoleLocators.confirm_btn,
+                          RoleLocators.removed_icon, RoleLocators.ok_btn)  # Delete the role
 
 # Run the test cases by executing the command: pytest tests/test_roles.py

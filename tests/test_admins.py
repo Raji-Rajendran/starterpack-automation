@@ -1,7 +1,6 @@
 import time
 
 import pytest
-from selenium.webdriver.common.by import By
 
 from configs.config import Config, AdminsConfig
 from locators.admin_locator import AdminLocators
@@ -49,7 +48,8 @@ def test_add_admin(admin_page):
     admin_page.verify_mandatory_fields()  # Verify the mandatory fields
     page_heading = admin_page.get_text_from_element(AdminLocators.page_heading)  # Get the text from the page heading
     assert page_heading == "Add Admin"  # Assert that the page heading is correct
-    page_description = admin_page.get_text_from_element(AdminLocators.page_description)  # Get the text from the page description
+    page_description = admin_page.get_text_from_element(
+        AdminLocators.page_description)  # Get the text from the page description
     assert page_description == "Add an admin here."  # Assert that the page description is correct
     admin_page.wait_for_element_visible(AdminLocators.first_name)  # Wait for the first name field to be visible
     admin_page.input_text(AdminLocators.first_name, AdminsConfig.first_name)  # Input the first name
@@ -107,10 +107,13 @@ def test_edit_admin(admin_page):
     admin_page.click_item(AdminLocators.edit_btn)  # Click the Admins link
     admin_page.wait_for_element_visible(AdminLocators.first_name)  # Wait for the save button to be visible
     time.sleep(2)  # Wait for 2 seconds
-    assert admin_page.get_text_from_element(AdminLocators.page_heading) == "Edit Admin"  # Assert that the page heading is correct
-    assert admin_page.get_text_from_element(AdminLocators.page_description) == "Edit an admin here."  # Assert that the page description is correct
+    assert admin_page.get_text_from_element(
+        AdminLocators.page_heading) == "Edit Admin"  # Assert that the page heading is correct
+    assert admin_page.get_text_from_element(
+        AdminLocators.page_description) == "Edit an admin here."  # Assert that the page description is correct
 
-    admin_page.verify_fields_validation(AdminLocators.first_name, AdminLocators.clear_first_name, AdminLocators.save_btn, AdminsConfig.first_name)
+    admin_page.verify_fields_validation(AdminLocators.first_name, AdminLocators.clear_first_name,
+                                        AdminLocators.save_btn, AdminsConfig.first_name)
 
     admin_page.input_text(AdminLocators.middle_name, AdminsConfig.middle_name)  # Input the middle name
     admin_page.click_item(AdminLocators.save_btn)  # Click the Save button
@@ -152,7 +155,9 @@ def test_email_validations(admin_page):
     time.sleep(2)  # Wait for 2 seconds
     admin_page.click_item(AdminLocators.add_admin)  # Click the Add Admin button
     admin_page.wait_for_element_visible(AdminLocators.page_heading)  # Wait for the page heading to be visible
-    validation_message_1, validation_message_2, validation_message_3, validation_message_4 = admin_page.verify_email_validation(AdminLocators.email, AdminLocators.clear_email, AdminsConfig.email_1, AdminsConfig.email_2, AdminsConfig.email_3, AdminsConfig.email_4)  # Verify the email validation
+    validation_message_1, validation_message_2, validation_message_3, validation_message_4 = admin_page.verify_email_validation(
+        AdminLocators.email, AdminLocators.clear_email, AdminsConfig.email_1, AdminsConfig.email_2,
+        AdminsConfig.email_3, AdminsConfig.email_4)  # Verify the email validation
 
     expected_message = "The Email field must be a valid email"
 
@@ -204,7 +209,7 @@ def test_filter(admin_page):
     time.sleep(10)
 
     role = admin_page.find_role_from_table()
-    assert any(role_value in AdminsConfig.filter_status for role_value in role), "Roles in table are not filtered as expected!"
-
+    assert any(
+        role_value in AdminsConfig.filter_status for role_value in role), "Roles in table are not filtered as expected!"
 
 # Run the test cases by executing the command: pytest tests/test_admins.py

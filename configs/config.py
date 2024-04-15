@@ -92,5 +92,3 @@ class RolesConfig:
     admin_last_name = barnum.create_name()[1]
     admin_email = f"{admin_first_name}.{admin_last_name}@yopmail.com"
     admin_phone = randint(1000000000, 9999999999)
-
-
