@@ -1,6 +1,8 @@
+import random
 import re
 import time
 
+import pytest
 from selenium.common import NoSuchElementException, StaleElementReferenceException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -12,6 +14,7 @@ from utils.helper_functions import HelperFunctions
 
 class Roles:
     def __init__(self, driver):
+        self.clicked_checkboxes = []
         self.driver = driver
         self.helper = HelperFunctions(self.driver)  # Create an instance of the Helper class
 
@@ -180,7 +183,8 @@ class Roles:
                         break
             except StaleElementReferenceException:
                 # Handle stale element reference exception by retrying
-                self.delete_user_added_role(role_to_match, popup_card, confirm_btn, removed_icon, not_removed_text, ok_btn)
+                self.delete_user_added_role(role_to_match, popup_card, confirm_btn, removed_icon, not_removed_text,
+                                            ok_btn)
                 break
             except NoSuchElementException:
                 # Handle case where h4 element is not found within a card
@@ -241,3 +245,68 @@ class Roles:
             except NoSuchElementException:
                 # Handle case where h4 element is not found within a card
                 raise Exception("Role element not found in a card.")
+
+    def click_random_roles(self):
+        time.sleep(3)
+
+        # Find all elements with class "v-input__control"
+        checkbox_elements = self.driver.find_elements(By.CLASS_NAME, "v-input__control")
+
+        # Initialize a list to store the IDs of clicked checkboxes
+        self.clicked_checkboxes = []
+
+        # Iterate through each checkbox element
+        for index, checkbox in enumerate(checkbox_elements):
+            # Skip the first checkbox (assuming it's the "Select All" button)
+            if index == 0 | index == 1:
+                continue
+
+            # Check if the element contains a checkbox
+            try:
+                checkbox_input = checkbox.find_element(By.TAG_NAME, "input")
+                checkbox_id = checkbox_input.get_attribute("id")
+
+                # Check if the checkbox is not already selected
+                if not checkbox_input.is_selected():
+                    # Randomly decide whether to check the checkbox or not
+                    if random.choice([True, False]):
+                        checkbox_input.click()
+                        print("Clicked checkbox:", checkbox_id)
+                        self.clicked_checkboxes.append(checkbox_id)  # Store the ID of the clicked checkbox
+            except:
+                pass  # If the element does not contain a checkbox, move to the next one
+
+    def verify_clicked_checkboxes(self):
+        print("Clicked checkboxes:", self.clicked_checkboxes)
+        # Wait for the page to load completely
+        time.sleep(3)  # You may need to adjust the sleep time based on the loading time of your webpage
+
+        # Find all elements with class "v-input__control"
+        checkbox_elements = self.driver.find_elements(By.CLASS_NAME, "v-input__control")
+
+        # Flag to track validation result
+        validation_failed = False
+
+        # Iterate through each checkbox element
+        for checkbox in checkbox_elements:
+            # Check if the element contains a checkbox
+            try:
+                checkbox_input = checkbox.find_element(By.TAG_NAME, "input")
+                checkbox_id = checkbox_input.get_attribute("id")
+                print("\n checkbox_id:", checkbox_id)
+
+                # Check if the checkbox should be selected
+                if checkbox_id in self.clicked_checkboxes:
+                    if checkbox_input.is_selected():
+                        print("Checkbox still selected:", checkbox_id)
+                    else:
+                        print("Checkbox not selected:", checkbox_id)
+                        # If checkbox that should be selected is found unselected, raise an exception
+                        validation_failed = True
+            except:
+                pass  # If the element does not contain a checkbox, move to the next one
+
+        # Raise an exception if validation fails
+        if validation_failed:
+            raise Exception(
+                "Validation failed: Some checkboxes that should be selected are unselected after page reload.")
